@@ -25,7 +25,7 @@ void growAll(vector<Particle> &p, int ts){
         if(p[i].L > p[i].Lmax){
             Particle pnew = Particle(0, 0, 0, 0, diameter, 0); //Necessary copy of all old parameters
             p.push_back(pnew); //Add new particle to p
-            divide(p[i], p[p.size() - 1]); //Set new properties of daughter particles
+            divide(p[i], p.back()); //Set new properties of daughter particles
             p[p.size()-1].ID = p.size() - 1; //Set new particle ID
             std::cout << "Division number " << p.size() - 1 << " has occurred at time step " << ts << std::endl;
         }
@@ -72,24 +72,23 @@ void run(std::string path){
     if(onCluster) outStream.open(path);
     else outStream.open("/home/romano/Documents/Workspace/1E-2.txt");
     Particle Test(0, 0, 0, startLength, diameter, growthRate);
-	Particle Test2(1.72, 0.01, 0, startLength, diameter, growthRate);
     std::vector<Particle> p;
-    Test.positions[1] = Coordinate(0.75, 0.75);
+	p.reserve(Nmax);
 	p.push_back(Test);
     int ts = 0;
-    while(p.size() < Nmax){
+    do{
         if(ts % relaxTime == 0) growAll(p, ts);
         if(ts % writeTime == 0) writeAll(p, outStream, ts);
         moveAll(p);
         ts++;
-    }
+    } while(p.size() < Nmax);
 }
 
 int main(int argc, char* argv[]){
 std::string stringy(argv[1]);
 clock_t before;
 before = clock();
-run("/home/romano/Documents/Workspace/Analysis/" + stringy);
+run("/home/rvangenderen/Workspace/Results/" + stringy);
 clock_t t = clock() - before;
 std::cout << t/CLOCKS_PER_SEC << std::endl;
 return 0;

@@ -42,6 +42,7 @@ double getTotalLength(std::vector<Coordinate> &myPoints){
 	return l;
 }
 
+///Rotate a point p around point (cx, cy)
 Coordinate rotateAroundPoint(Coordinate p, double cx, double cy, double angle){
 	return Coordinate(cos(angle) * (p.x - cx) - sin(angle) * (p.y - cy) + cx,
                   sin(angle) * (p.x - cx) + cos(angle) * (p.y - cy) + cy);

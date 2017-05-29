@@ -84,7 +84,7 @@ void relax(std::vector<Coordinate> &myArray){
 
     for(int i = 0; i < npivot; ++i){
         while(!flag){
-            myData = equidistantPointOnLine(fixed[i], myDeq[0], fixed[i], l);
+            myData = equidistantPointOnLine(fixed[i], myDeq.front(), fixed[i], l);
             flag = myData.second;
             if(!flag){
                 myDeq.pop_front(); // Pop the line if the point is passed
@@ -103,10 +103,10 @@ void relax(std::vector<Coordinate> &myArray){
 // 2. Shifts the head such that at the division planes the particles do not overlap using correctHead()
 // 3. Interpolates using relax() to make all internal springs relaxed
 void divide(Particle &pOld, Particle &pNew){
-
     // Find middle point of particle
     int split = (npivot+1)/2;
     pNew.mu = pOld.mu + randomMu(); //Growth noise instead of length noise
+    pOld.mu += randomMu();
     pNew.Lmax = pOld.Lmax;
     pNew.D = pOld.D;
 
@@ -132,9 +132,9 @@ void divide(Particle &pOld, Particle &pNew){
     pNew.positions = newPositionArray;
 
     // Angle noise
-    double randomAngle = randomTheta();
-    for(int i = 0; i < npivot; ++i){
-            pNew.positions[i] = rotateAroundPoint(pNew.positions[i], pNew.positions[i + 1].x, pNew.positions[i + 1].y, randomAngle); //Angle noise!
+    double randomAngle = 0.001;
+    for(int i = 0; i < npivot + 1; ++i){
+            pNew.positions[i] = rotateAroundPoint(pNew.positions[i], pNew.positions.back().x, pNew.positions.back().y, randomAngle); //Angle noise!
     }
 
     // Set rest length equal to total particle length divided by number of springs
@@ -169,10 +169,10 @@ void divide(Particle &pOld, Particle &pNew){
     pOld.positions = newPositionArray;
 
     // Angle noise
-//    randomAngle = randomTheta();
-//    for(int i = npivot+2; i > 0; --i){
-//            pOld.positions[i] = rotateAroundPoint(pOld.positions[i], pOld.positions[i - 1].x, pOld.positions[i - 1].y, randomAngle); //Angle noise!
-//    }
+    randomAngle = -0.001;
+    for(int i = 0; i < npivot + 1; ++i){
+            pOld.positions[i] = rotateAroundPoint(pOld.positions[i], pOld.positions.back().x, pOld.positions.back().y, randomAngle); //Angle noise!
+    }
 
     // Set rest length equal to total particle length divided by number of springs
     totalLength = 0;
