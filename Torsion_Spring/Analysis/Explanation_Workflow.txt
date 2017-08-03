@@ -11,4 +11,5 @@ Since many analyses take a long time, we use pickling to allow us to do this on 
 Pickling allows us to store the analysis results in .p files, which can be easily read into Python for displaying.
 These six Analyze_Data_* files are called by running the shellscript called Make_Pickles.
 This shellscript uses the files in the Analyze_Colony package to generate pickles (.p files)
+It reads files in the format
 These are then read by the files in the Unpickle folder
