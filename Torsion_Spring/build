@@ -1,0 +1,2 @@
+#!/bin/bash
+g++ Source.cpp coordinate.cpp twovec.cpp particle.cpp division.cpp repulsion.cpp -pg -std=gnu++11 -O3
