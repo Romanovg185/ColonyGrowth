@@ -1,0 +1,2 @@
+#!/bin/bash
+g++ Source.cpp particle.cpp division.cpp repulsion.cpp  -o my.out -std=gnu++11 -O3
