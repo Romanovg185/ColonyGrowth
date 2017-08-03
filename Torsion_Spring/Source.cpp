@@ -4,7 +4,6 @@
 #include <ctime>
 #include <vector>
 #include <string>
-#include "print.h"
 #include <ctime> // time_t
 #include <cstdio>
 #include <array>
@@ -17,80 +16,83 @@
 #include "particle.h" // All clean and tidy in its own file
 #include "division.h"
 
+using namespace std;
+
 ///Master function growAll
-void growAll(vector<Particle> &p, int ts){
-    int lengthBefore = p.size(); //Since a particle cannot divide twice during the same growAll() call, only loop over the initial amount of particles
-    for(int i = 0; i < lengthBefore; i++){ //Unable to be range based since the ranging object changes length, leading to an infinite loop
+void grow_all(vector<Particle> &p, int ts){
+    int length_before = p.size(); //Since a particle cannot divide twice during the same growAll() call, only loop over the initial amount of particles
+    for(int i = 0; i < length_before; i++){ //Unable to be range based since the ranging object changes length, leading to an infinite loop
         p[i].grow();
         if(p[i].L > p[i].Lmax){
+            //p[i].str();
             Particle pnew = Particle(0, 0, 0, 0, diameter, 0); //Necessary copy of all old parameters
             p.push_back(pnew); //Add new particle to p
             divide(p[i], p.back()); //Set new properties of daughter particles
             p.back().ID = p.size() - 1; //Set new particle ID
-            std::cout << "Division number " << p.size() - 1 << " has occurred at time step " << ts << std::endl;
+            p[i].str();
+            p.back().str();
+            //std::cout << "Division number " << p.size() - 1 << " has occurred at time step " << ts << std::endl;
         }
     }
 }
 
 ///Master function moveAll
-void moveAll(vector<Particle> &p){
+void move_all(vector<Particle> &p){
     for(Particle &part : p){
         part.clear(); //Put on top to be able to monitor the forces after a time step
     }
-    repulsiveForce(p);
+    repulsive_force(p);
     for(Particle &part : p){
-		part.forceInternal();
-        part.removeSelfOverlap();
-        part.torsionForce();
+		part.force_internal();
+        part.remove_self_overlap();
+        part.torsion_force();
 		part.move();
     }
 }
 
-void writeAll(vector<Particle> &p, ofstream &outStream, int ts){
+void write_all(vector<Particle> &p, ofstream &out_stream, int ts){
     for(Particle &part : p){
-        outStream << ts << " ";
-        outStream << part.ID << " ";
-        outStream << part.D << " ";
+        out_stream << ts << " ";
+        out_stream << part.ID << " ";
+        out_stream << part.D << " ";
         for(Coordinate &coord : part.positions){
-            outStream << coord.x << "," << coord.y << " ";
+            out_stream << coord.x << "," << coord.y << " ";
         }
         for(TwoVec &tv : part.forces){
-            outStream << tv.x << "," << tv.y << " ";
+            out_stream << tv.x << "," << tv.y << " ";
         }
         for(double &d : part.pressures){
-            outStream << d << " ";
+            out_stream << d << " ";
         }
-		outStream << ";";
+		out_stream << ";";
     }
-    outStream << std::endl;
-    std::cout << ts << std::endl;
+    out_stream << std::endl;
 }
 
-void run(std::string path){
-	std::cout << path << std::endl;
-    ofstream outStream;
-    if(onCluster) outStream.open(path);
-    else outStream.open("/home/romano/Documents/Workspace/1E-2.txt");
-    Particle Test(0, 0, 0, startLength, diameter, growthRate);
-    std::vector<Particle> p;
+void run(string file_name){
+	cout << path << endl;
+    ofstream out_stream;
+    out_stream.open(path);
+    Particle Test(0, 0, 0, start_length, diameter, growth_rate);
+    vector<Particle> p;
 	p.reserve(Nmax);
 	p.push_back(Test);
     int ts = 0;
     do{
-        if(ts % relaxTime == 0) growAll(p, ts);
-        if(ts % writeTime == 0) writeAll(p, outStream, ts);
-        moveAll(p);
+        if(ts % relax_time == 0) grow_all(p, ts);
+        if(ts % write_time == 0) write_all(p, out_stream, ts);
+        move_all(p);
         ts++;
     } while(p.size() < Nmax);
+    out_stream.close();
 }
 
 int main(int argc, char* argv[]){
-	std::string stringy(argv[1]);
-	clock_t before;
-	before = clock();
-	Particle Test = Particle(0, 0, 0, startLength, diameter, growthRate);
-	run(path + stringy);
-	clock_t t = clock() - before;
-	std::cout << t/CLOCKS_PER_SEC << std::endl;
-	return 0;
+string stringy(argv[1]);
+clock_t before;
+before = clock();
+run(stringy);
+clock_t t = clock() - before;
+std::cout << t/CLOCKS_PER_SEC << std::endl;
+return 0;
 }

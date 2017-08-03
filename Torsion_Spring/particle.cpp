@@ -11,24 +11,24 @@
 
 
 /// Constructor of the Particle structure
-Particle::Particle(double xstart, double ystart, double angle, double restlength, double diameter, double growth){
+Particle::Particle(double x_start, double y_start, double angle, double rest_length, double diameter, double growth){
 
     ID = 0;
     D = diameter;
-    L = restlength;
+    L = rest_length;
     mu = growth;
-    Lmax = maxLength;
+    Lmax = max_length;
     len = L*(npivot+1);
 
     theta = angle;
-    positions[0].x = xstart;
-    positions[0].y = ystart;
-    positions[npivot + 1].x = xstart + L*(npivot + 1)*cos(theta);
-    positions[npivot + 1].y = ystart + L*(npivot + 1)*sin(theta);
+    positions[0].x = x_start;
+    positions[0].y = y_start;
+    positions[npivot + 1].x = x_start + L*(npivot + 1)*cos(theta);
+    positions[npivot + 1].y = y_start + L*(npivot + 1)*sin(theta);
 
     for (int i = 1; i <= npivot; i++) {
-        positions[i].x = xstart + (positions[npivot + 1].x - xstart)/(npivot + 1)*i;
-        positions[i].y = ystart + (positions[npivot + 1].y - ystart)/(npivot + 1)*i;
+        positions[i] = Coordinate(x_start + (positions[npivot + 1].x - x_start)/(npivot + 1)*i,
+                                  y_start + (positions[npivot + 1].y - y_start)/(npivot + 1)*i);
     }
 
     for (int i = 0; i < npivot + 2; i++){
@@ -62,7 +62,7 @@ void Particle::str(){
 }
 
 ///Calculates the internal spring force
-void Particle::forceInternal(){
+void Particle::force_internal(){
     TwoVec dr;
     double len;
     TwoVec fint;
@@ -76,7 +76,7 @@ void Particle::forceInternal(){
 }
 
 ///Prevents the particle from crossing through itself
-void Particle::removeSelfOverlap(){
+void Particle::remove_self_overlap(){
     double d;
     double d_rest;
     double Ftot;
@@ -97,7 +97,7 @@ void Particle::removeSelfOverlap(){
 }
 
 ///Torsion spring
-void Particle::torsionForce(){
+void Particle::torsion_force(){
     double alpha;
     double torque;
     TwoVec m;
@@ -108,7 +108,8 @@ void Particle::torsionForce(){
     for(int i = 1; i < npivot + 1; ++i){
         l1 = positions[i] - positions[i - 1];
         l2 = positions[i + 1] - positions[i];
-        alpha = angleBetweenVectors(l1, l2);
+        alpha = angle_between_vectors(l1, l2);
+        if(ID == 0)cout << alpha << "," << endl;
         torque = kappa*alpha;
 		m = cross(l1, l2);
 		if(fabs(m.z) > EPSILON){
@@ -122,14 +123,6 @@ void Particle::torsionForce(){
 		}
     }
 
-}
-
-
-void Particle::straighten(){
-	for(int i = 1; i < npivot + 1; ++i){
-		positions[i].x = (positions[i+1].x + positions[i-1].x)/2;
-		positions[i].y = (positions[i+1].y + positions[i-1].y)/2;
-	}
 }
 
 ///Moves the particle

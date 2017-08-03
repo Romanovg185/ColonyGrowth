@@ -20,9 +20,9 @@ struct Particle{
 
 	void grow();
     void str();
-    void forceInternal();
-    void removeSelfOverlap();
-    void torsionForce();
+    void force_internal();
+    void remove_self_overlap();
+    void torsion_force();
     void move();
     void rotate();
     void clear();
