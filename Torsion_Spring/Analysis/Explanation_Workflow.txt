@@ -1,0 +1,14 @@
+Image Generation:
+In order to generate an image, you run Export_Image.sh. 
+This shellscript generates an image at the first timestep where you have 500 or more particles, then 1000 and more, etc.
+If the image does not look right, for example showing thin white lines spanning the image, please use Matplotlib 2.0.2 or newer.
+These images can then be analyzed using the the following ImageJ Macros:
+- Whitespace.ijm to determine the packing fraction
+- EllipticalFit.ijm to determine the ellipticity of the colony
+
+Data Generation:
+Since many analyses take a long time, we use pickling to allow us to do this on the cluster as well.
+Pickling allows us to store the analysis results in .p files, which can be easily read into Python for displaying.
+These six Analyze_Data_* files are called by running the shellscript called Make_Pickles.
+This shellscript uses the files in the Analyze_Colony package to generate pickles (.p files)
+These are then read by the files in the Unpickle folder
